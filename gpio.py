@@ -10,20 +10,20 @@ import numpy.typing as npt
 
 WHISPER_ENDPOINT: str = "http://10.1.69.213:1111/voice_to_text"
 LLM_MODEL: str = "gemma3:27b"
+WEATHER: str = "http://10.1.69.213:11434"
 client: Client = Client(host="http://ai.dfec.xyz:11434")
 
 
-def voice_to_text(audio: npt.NDArray) -> str:
+def voice_to_text(audio: npt.NDArray) -> dict[str, str]:
     # Serialize the array
     payload = {"audio": audio.tolist()}  # convert to regular list for JSON
 
     r = requests.post(WHISPER_ENDPOINT, json=payload)
-    return (
-        r.text
-    )  # IF LLM DOESNT LIKE IT, GIVING ME JSON BUT WANT PURE STR...CAN ASK CHATGPT
+    result = r.json()  # parse JSON response
+    return result["text"]  # extract only the transcribed text
 
 
-def LLM_process(raw_text: str) -> str:
+def LLM_process(raw_text: str) -> str | None:
     """This script evaluates an LLM prompt for processing text so that it can be used for the wttr.in API"""
     response = client.chat(
         model=LLM_MODEL,
@@ -52,7 +52,14 @@ def LLM_process(raw_text: str) -> str:
 def get_weather(spot: str) -> str:
     # GET wttr.in
     # return response object message content
-    return ""
+    # look at system diagram
+    fetch_url = f"https://wttr.in/{spot}"
+    print(fetch_url)
+    r = requests.get(fetch_url)
+    if r.status_code == 200:
+        return r.text
+
+    return f"Error with wttr.in: {r.status_code}"
 
 
 def record_audio(duration_seconds: int = 4) -> npt.NDArray:
@@ -73,10 +80,13 @@ def pressed():
     audio = record_audio()
     print("Done")
     print(len(audio))  # Temporary line
-    raw_text = voice_to_text(audio)
+    #whisper returns json but we only care about plain text 
+    raw_text = voice_to_text(audio)['text'] 
     print(raw_text)
     spot = LLM_process(raw_text)
     print(spot)
+    weather = get_weather(spot)
+    print(weather)
 
 
 if __name__ == "__main__":
