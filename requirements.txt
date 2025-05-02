@@ -1,0 +1,7 @@
+# Add other requirements...
+gpiozero
+rpi-lgpio
+requests
+sounddevice
+numpy
+ollama
