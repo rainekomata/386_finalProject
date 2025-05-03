@@ -6,8 +6,6 @@ import sounddevice as sd
 import numpy as np
 import numpy.typing as npt
 
-# in virtal env download
-
 WHISPER_ENDPOINT: str = "http://10.1.69.213:1111/voice_to_text"
 LLM_MODEL: str = "gemma3:27b"
 WEATHER: str = "http://10.1.69.213:11434"
@@ -46,13 +44,10 @@ def LLM_process(raw_text: str) -> str | None:
             },
         ],
     )
-    return response.message.content  # insert prompt - this functiuon talks to the LLM
+    return response.message.content
 
 
 def get_weather(spot: str) -> str:
-    # GET wttr.in
-    # return response object message content
-    # look at system diagram
     fetch_url = f"https://wttr.in/{spot}"
     print(fetch_url)
     r = requests.get(fetch_url)
