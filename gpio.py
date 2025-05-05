@@ -75,8 +75,8 @@ def pressed():
     audio = record_audio()
     print("Done")
     print(len(audio))  # Temporary line
-    #whisper returns json but we only care about plain text 
-    raw_text = voice_to_text(audio)['text'] 
+    # whisper returns json but we only care about plain text
+    raw_text = voice_to_text(audio)["text"]
     print(raw_text)
     spot = LLM_process(raw_text)
     print(spot)
