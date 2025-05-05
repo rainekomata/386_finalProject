@@ -15,9 +15,7 @@ torch_dtype = torch.float16 if torch.cuda.is_available() else torch.float32
 print(f"Using device {device}.")
 
 
-def build_pipeline(
-    model_id: str, torch_dtype: torch.dtype, device: str
-) -> Pipeline:
+def build_pipeline(model_id: str, torch_dtype: torch.dtype, device: str) -> Pipeline:
     """Creates a Hugging Face automatic-speech-recognition pipeline on the given device."""
     model = AutoModelForSpeechSeq2Seq.from_pretrained(
         model_id,
@@ -38,14 +36,18 @@ def build_pipeline(
     )
     return pipe
 
+
 print("Building model pipeline...")
 pipe = build_pipeline(model_id, torch_dtype, device)
 print(type(pipe))
 print("Done")
 
 app = FastAPI()
+
+
 class AudioData(BaseModel):
     audio: List[float]
+
 
 @app.post("/voice_to_text")
 def voice_to_text(data: AudioData):
@@ -53,5 +55,3 @@ def voice_to_text(data: AudioData):
     # Now pass np_audio to your model
     transcript = pipe(np_audio)
     return {"text": transcript}
-
-    
